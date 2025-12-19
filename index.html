@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fuel Cost Calculator - Sri Lanka</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group.main-input {
+            background: #f8f9ff;
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #667eea;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            margin: 0;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .secondary-inputs {
+            background: #fafafa;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .secondary-inputs h2 {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .result {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .result h2 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .result .total {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .result .breakdown {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            font-size: 14px;
+        }
+
+        .breakdown-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .breakdown-item .label {
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .breakdown-item .value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 24px;
+            }
+
+            .result .total {
+                font-size: 36px;
+            }
+
+            .result .breakdown {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚗 Fuel Cost Calculator</h1>
+        <div class="subtitle">Calculate your trip cost in Sri Lanka</div>
+
+        <div class="input-group main-input">
+            <label for="tripLength">Trip Length (km)</label>
+            <input type="number" id="tripLength" min="0" step="0.1" value="0" placeholder="Enter trip distance">
+            
+            <div class="checkbox-group">
+                <input type="checkbox" id="roundTrip">
+                <label for="roundTrip">Round Trip (multiply distance by 2)</label>
+            </div>
+        </div>
+
+        <div class="secondary-inputs">
+            <h2>Vehicle & Fuel Details</h2>
+            
+            <div class="input-group">
+                <label for="kmpl">Kilometers per Liter (km/l)</label>
+                <input type="number" id="kmpl" min="0" step="0.1" value="14" placeholder="Fuel efficiency">
+            </div>
+
+            <div class="input-group">
+                <label for="fuelPrice">Current Fuel Price (Rs/liter)</label>
+                <input type="number" id="fuelPrice" min="0" step="0.01" value="294" placeholder="Price per liter">
+            </div>
+
+            <div class="input-group">
+                <label for="serviceCost">Full Service Cost (Rs)</label>
+                <input type="number" id="serviceCost" min="0" step="1" value="35000" placeholder="Service cost">
+            </div>
+
+            <div class="input-group">
+                <label for="serviceInterval">Service Interval (km)</label>
+                <input type="number" id="serviceInterval" min="1" step="1" value="5000" placeholder="KM between services">
+            </div>
+        </div>
+
+        <div class="result">
+            <h2>Total Trip Cost</h2>
+            <div class="total">Rs <span id="totalCost">0.00</span></div>
+            
+            <div class="breakdown">
+                <div class="breakdown-item">
+                    <div class="label">Fuel Cost</div>
+                    <div class="value">Rs <span id="fuelCost">0.00</span></div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="label">Service Cost</div>
+                    <div class="value">Rs <span id="serviceCostBreakdown">0.00</span></div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="label">Total Distance</div>
+                    <div class="value"><span id="totalDistance">0</span> km</div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="label">Fuel Required</div>
+                    <div class="value"><span id="fuelRequired">0.00</span> L</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get all input elements
+        const tripLengthInput = document.getElementById('tripLength');
+        const roundTripCheckbox = document.getElementById('roundTrip');
+        const kmplInput = document.getElementById('kmpl');
+        const fuelPriceInput = document.getElementById('fuelPrice');
+        const serviceCostInput = document.getElementById('serviceCost');
+        const serviceIntervalInput = document.getElementById('serviceInterval');
+
+        // Get result elements
+        const totalCostElement = document.getElementById('totalCost');
+        const fuelCostElement = document.getElementById('fuelCost');
+        const serviceCostBreakdownElement = document.getElementById('serviceCostBreakdown');
+        const totalDistanceElement = document.getElementById('totalDistance');
+        const fuelRequiredElement = document.getElementById('fuelRequired');
+
+        // Store previous values to detect changes
+        let previousValues = {
+            tripLength: tripLengthInput.value,
+            roundTrip: roundTripCheckbox.checked,
+            kmpl: kmplInput.value,
+            fuelPrice: fuelPriceInput.value,
+            serviceCost: serviceCostInput.value,
+            serviceInterval: serviceIntervalInput.value
+        };
+
+        // Calculate and update results
+        function calculate() {
+            // Get current values
+            const currentValues = {
+                tripLength: tripLengthInput.value,
+                roundTrip: roundTripCheckbox.checked,
+                kmpl: kmplInput.value,
+                fuelPrice: fuelPriceInput.value,
+                serviceCost: serviceCostInput.value,
+                serviceInterval: serviceIntervalInput.value
+            };
+
+            // Check if any value has changed
+            let hasChanged = false;
+            for (let key in currentValues) {
+                if (currentValues[key] !== previousValues[key]) {
+                    hasChanged = true;
+                    break;
+                }
+            }
+
+            // Only calculate if values have changed
+            if (hasChanged) {
+                previousValues = {...currentValues};
+
+                // Parse input values
+                const tripLength = parseFloat(tripLengthInput.value) || 0;
+                const isRoundTrip = roundTripCheckbox.checked;
+                const kmpl = parseFloat(kmplInput.value) || 1;
+                const fuelPrice = parseFloat(fuelPriceInput.value) || 0;
+                const serviceCost = parseFloat(serviceCostInput.value) || 0;
+                const serviceInterval = parseFloat(serviceIntervalInput.value) || 1;
+
+                // Calculate total distance
+                const totalDistance = isRoundTrip ? tripLength * 2 : tripLength;
+
+                // Calculate fuel required
+                const fuelRequired = totalDistance / kmpl;
+
+                // Calculate fuel cost
+                const fuelCost = fuelRequired * fuelPrice;
+
+                // Calculate service cost proportional to distance
+                const serviceProportionCost = (totalDistance / serviceInterval) * serviceCost;
+
+                // Calculate total cost
+                const totalCost = fuelCost + serviceProportionCost;
+
+                // Update display with formatted numbers
+                totalCostElement.textContent = totalCost.toFixed(2);
+                fuelCostElement.textContent = fuelCost.toFixed(2);
+                serviceCostBreakdownElement.textContent = serviceProportionCost.toFixed(2);
+                totalDistanceElement.textContent = totalDistance.toFixed(1);
+                fuelRequiredElement.textContent = fuelRequired.toFixed(2);
+            }
+        }
+
+        // Run calculation every 100ms (0.1 seconds)
+        setInterval(calculate, 100);
+
+        // Initial calculation
+        calculate();
+    </script>
+</body>
+</html>
+

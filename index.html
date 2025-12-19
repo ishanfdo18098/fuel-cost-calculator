@@ -282,26 +282,7 @@
                 tripLengthEdited = true;
             }
         });
-
-        // Restore default if left empty
-        tripLengthInput.addEventListener('blur', function() {
-            if (this.value === '' || this.value === null) {
-                this.value = '1';
-                tripLengthEdited = false;
-            }
-        });
-
-        // Store previous values to detect changes
-        let previousValues = {
-            tripLength: tripLengthInput.value,
-            roundTrip: roundTripCheckbox.checked,
-            kmpl: kmplInput.value,
-            fuelPrice: fuelPriceInput.value,
-            tankSize: tankSizeInput.value,
-            serviceCost: serviceCostInput.value,
-            serviceInterval: serviceIntervalInput.value
-        };
-
+        
         // Format number with comma separators
         function formatNumber(num, decimals = 2) {
             return num.toLocaleString('en-IN', {
@@ -312,71 +293,52 @@
 
         // Calculate and update results
         function calculate() {
-            // Get current values
-            const currentValues = {
-                tripLength: tripLengthInput.value,
-                roundTrip: roundTripCheckbox.checked,
-                kmpl: kmplInput.value,
-                fuelPrice: fuelPriceInput.value,
-                tankSize: tankSizeInput.value,
-                serviceCost: serviceCostInput.value,
-                serviceInterval: serviceIntervalInput.value
-            };
+            // Parse input values
+            const tripLength = parseFloat(tripLengthInput.value) || 0;
+            const isRoundTrip = roundTripCheckbox.checked;
+            const kmpl = parseFloat(kmplInput.value) || 1;
+            const fuelPrice = parseFloat(fuelPriceInput.value) || 0;
+            const tankSize = parseFloat(tankSizeInput.value) || 1;
+            const serviceCost = parseFloat(serviceCostInput.value) || 0;
+            const serviceInterval = parseFloat(serviceIntervalInput.value) || 1;
 
-            // Check if any value has changed
-            let hasChanged = false;
-            for (let key in currentValues) {
-                if (currentValues[key] !== previousValues[key]) {
-                    hasChanged = true;
-                    break;
-                }
-            }
+            // Calculate total distance
+            const totalDistance = isRoundTrip ? tripLength * 2 : tripLength;
 
-            // Only calculate if values have changed
-            if (hasChanged) {
-                previousValues = {...currentValues};
+            // Calculate fuel required
+            const fuelRequired = totalDistance / kmpl;
 
-                // Parse input values
-                const tripLength = parseFloat(tripLengthInput.value) || 0;
-                const isRoundTrip = roundTripCheckbox.checked;
-                const kmpl = parseFloat(kmplInput.value) || 1;
-                const fuelPrice = parseFloat(fuelPriceInput.value) || 0;
-                const tankSize = parseFloat(tankSizeInput.value) || 1;
-                const serviceCost = parseFloat(serviceCostInput.value) || 0;
-                const serviceInterval = parseFloat(serviceIntervalInput.value) || 1;
+            // Calculate tank percentage
+            const tankPercentage = (fuelRequired / tankSize) * 100;
 
-                // Calculate total distance
-                const totalDistance = isRoundTrip ? tripLength * 2 : tripLength;
+            // Calculate fuel cost
+            const fuelCost = fuelRequired * fuelPrice;
 
-                // Calculate fuel required
-                const fuelRequired = totalDistance / kmpl;
+            // Calculate service cost proportional to distance
+            const serviceProportionCost = (totalDistance / serviceInterval) * serviceCost;
 
-                // Calculate tank percentage
-                const tankPercentage = (fuelRequired / tankSize) * 100;
+            // Calculate total cost
+            const totalCost = fuelCost + serviceProportionCost;
 
-                // Calculate fuel cost
-                const fuelCost = fuelRequired * fuelPrice;
-
-                // Calculate service cost proportional to distance
-                const serviceProportionCost = (totalDistance / serviceInterval) * serviceCost;
-
-                // Calculate total cost
-                const totalCost = fuelCost + serviceProportionCost;
-
-                // Update display with formatted numbers
-                totalCostElement.textContent = formatNumber(totalCost);
-                fuelCostElement.textContent = formatNumber(fuelCost);
-                serviceCostBreakdownElement.textContent = formatNumber(serviceProportionCost);
-                totalDistanceElement.textContent = formatNumber(totalDistance, 1);
-                fuelRequiredElement.textContent = formatNumber(fuelRequired);
-                tankPercentageElement.textContent = formatNumber(tankPercentage);
-            }
+            // Update display with formatted numbers
+            totalCostElement.textContent = formatNumber(totalCost);
+            fuelCostElement.textContent = formatNumber(fuelCost);
+            serviceCostBreakdownElement.textContent = formatNumber(serviceProportionCost);
+            totalDistanceElement.textContent = formatNumber(totalDistance, 1);
+            fuelRequiredElement.textContent = formatNumber(fuelRequired);
+            tankPercentageElement.textContent = formatNumber(tankPercentage);
         }
 
-        // Run calculation every 100ms (0.1 seconds)
-        setInterval(calculate, 100);
+        // Add event listeners to all inputs
+        tripLengthInput.addEventListener('input', calculate);
+        roundTripCheckbox.addEventListener('change', calculate);
+        kmplInput.addEventListener('input', calculate);
+        fuelPriceInput.addEventListener('input', calculate);
+        tankSizeInput.addEventListener('input', calculate);
+        serviceCostInput.addEventListener('input', calculate);
+        serviceIntervalInput.addEventListener('input', calculate);
 
-        // Initial calculation
+        // Initial calculation on page load
         calculate();
     </script>
 </body>

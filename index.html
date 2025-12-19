@@ -217,6 +217,10 @@
                     <div class="label">Fuel Required</div>
                     <div class="value"><span id="fuelRequired">0.00</span> L</div>
                 </div>
+                <div class="breakdown-item">
+                    <div class="label">Tank Usage</div>
+                    <div class="value"><span id="tankPercentage">0.00</span>%</div>
+                </div>
             </div>
         </div>
 
@@ -231,6 +235,11 @@
             <div class="input-group">
                 <label for="fuelPrice">Current Fuel Price (Rs/liter)</label>
                 <input type="number" id="fuelPrice" min="0" step="0.01" value="294" placeholder="Price per liter">
+            </div>
+
+            <div class="input-group">
+                <label for="tankSize">Fuel Tank Size (L)</label>
+                <input type="number" id="tankSize" min="1" step="1" value="36" placeholder="Tank capacity">
             </div>
 
             <div class="input-group">
@@ -251,6 +260,7 @@
         const roundTripCheckbox = document.getElementById('roundTrip');
         const kmplInput = document.getElementById('kmpl');
         const fuelPriceInput = document.getElementById('fuelPrice');
+        const tankSizeInput = document.getElementById('tankSize');
         const serviceCostInput = document.getElementById('serviceCost');
         const serviceIntervalInput = document.getElementById('serviceInterval');
 
@@ -260,6 +270,7 @@
         const serviceCostBreakdownElement = document.getElementById('serviceCostBreakdown');
         const totalDistanceElement = document.getElementById('totalDistance');
         const fuelRequiredElement = document.getElementById('fuelRequired');
+        const tankPercentageElement = document.getElementById('tankPercentage');
 
         // Store previous values to detect changes
         let previousValues = {
@@ -267,6 +278,7 @@
             roundTrip: roundTripCheckbox.checked,
             kmpl: kmplInput.value,
             fuelPrice: fuelPriceInput.value,
+            tankSize: tankSizeInput.value,
             serviceCost: serviceCostInput.value,
             serviceInterval: serviceIntervalInput.value
         };
@@ -287,6 +299,7 @@
                 roundTrip: roundTripCheckbox.checked,
                 kmpl: kmplInput.value,
                 fuelPrice: fuelPriceInput.value,
+                tankSize: tankSizeInput.value,
                 serviceCost: serviceCostInput.value,
                 serviceInterval: serviceIntervalInput.value
             };
@@ -309,6 +322,7 @@
                 const isRoundTrip = roundTripCheckbox.checked;
                 const kmpl = parseFloat(kmplInput.value) || 1;
                 const fuelPrice = parseFloat(fuelPriceInput.value) || 0;
+                const tankSize = parseFloat(tankSizeInput.value) || 1;
                 const serviceCost = parseFloat(serviceCostInput.value) || 0;
                 const serviceInterval = parseFloat(serviceIntervalInput.value) || 1;
 
@@ -317,6 +331,9 @@
 
                 // Calculate fuel required
                 const fuelRequired = totalDistance / kmpl;
+
+                // Calculate tank percentage
+                const tankPercentage = (fuelRequired / tankSize) * 100;
 
                 // Calculate fuel cost
                 const fuelCost = fuelRequired * fuelPrice;
@@ -333,6 +350,7 @@
                 serviceCostBreakdownElement.textContent = formatNumber(serviceProportionCost);
                 totalDistanceElement.textContent = formatNumber(totalDistance, 1);
                 fuelRequiredElement.textContent = formatNumber(fuelRequired);
+                tankPercentageElement.textContent = formatNumber(tankPercentage);
             }
         }
 

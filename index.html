@@ -271,6 +271,14 @@
             serviceInterval: serviceIntervalInput.value
         };
 
+        // Format number with comma separators
+        function formatNumber(num, decimals = 2) {
+            return num.toLocaleString('en-IN', {
+                minimumFractionDigits: decimals,
+                maximumFractionDigits: decimals
+            });
+        }
+
         // Calculate and update results
         function calculate() {
             // Get current values
@@ -320,11 +328,11 @@
                 const totalCost = fuelCost + serviceProportionCost;
 
                 // Update display with formatted numbers
-                totalCostElement.textContent = totalCost.toFixed(2);
-                fuelCostElement.textContent = fuelCost.toFixed(2);
-                serviceCostBreakdownElement.textContent = serviceProportionCost.toFixed(2);
-                totalDistanceElement.textContent = totalDistance.toFixed(1);
-                fuelRequiredElement.textContent = fuelRequired.toFixed(2);
+                totalCostElement.textContent = formatNumber(totalCost);
+                fuelCostElement.textContent = formatNumber(fuelCost);
+                serviceCostBreakdownElement.textContent = formatNumber(serviceProportionCost);
+                totalDistanceElement.textContent = formatNumber(totalDistance, 1);
+                fuelRequiredElement.textContent = formatNumber(fuelRequired);
             }
         }
 
@@ -336,4 +344,3 @@
     </script>
 </body>
 </html>
-

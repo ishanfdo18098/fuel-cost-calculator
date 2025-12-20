@@ -63,7 +63,7 @@
             font-size: 14px;
         }
 
-        input[type="number"] {
+        input[type="text"] {
             width: 100%;
             padding: 12px;
             border: 2px solid #e0e0e0;
@@ -72,7 +72,7 @@
             transition: all 0.3s;
         }
 
-        input[type="number"]:focus {
+        input[type="text"]:focus {
             outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
@@ -188,7 +188,7 @@
 
         <div class="input-group main-input">
             <label for="tripLength">Trip Length (km)</label>
-            <input type="number" id="tripLength" min="0" step="0.1" value="1" placeholder="Enter trip distance">
+            <input type="text" id="tripLength" value="1" placeholder="Enter trip distance">
             
             <div class="checkbox-group">
                 <input type="checkbox" id="roundTrip">
@@ -229,27 +229,27 @@
             
             <div class="input-group">
                 <label for="kmpl">Kilometers per Liter (km/l)</label>
-                <input type="number" id="kmpl" min="0" step="0.1" value="14" placeholder="Fuel efficiency">
+                <input type="text" id="kmpl" value="14" placeholder="Fuel efficiency">
             </div>
 
             <div class="input-group">
                 <label for="fuelPrice">Current Fuel Price (Rs/liter)</label>
-                <input type="number" id="fuelPrice" min="0" step="0.01" value="294" placeholder="Price per liter">
+                <input type="text" id="fuelPrice" value="294" placeholder="Price per liter">
             </div>
 
             <div class="input-group">
                 <label for="tankSize">Fuel Tank Size (L)</label>
-                <input type="number" id="tankSize" min="1" step="1" value="36" placeholder="Tank capacity">
+                <input type="text" id="tankSize" value="36" placeholder="Tank capacity">
             </div>
 
             <div class="input-group">
                 <label for="serviceCost">Full Service Cost (Rs)</label>
-                <input type="number" id="serviceCost" min="0" step="1" value="35000" placeholder="Service cost">
+                <input type="text" id="serviceCost" value="35,000" placeholder="Service cost">
             </div>
 
             <div class="input-group">
                 <label for="serviceInterval">Service Interval (km)</label>
-                <input type="number" id="serviceInterval" min="1" step="1" value="5000" placeholder="KM between services">
+                <input type="text" id="serviceInterval" value="5,000" placeholder="KM between services">
             </div>
         </div>
     </div>
@@ -291,16 +291,69 @@
             });
         }
 
+        // Format input value with comma separators
+        function formatInputNumber(num) {
+            if (isNaN(num) || num === '') return '';
+            // Handle decimals
+            const parts = num.toString().split('.');
+            parts[0] = parseFloat(parts[0]).toLocaleString('en-US');
+            return parts.join('.');
+        }
+
+        // Parse formatted number back to float
+        function parseFormattedNumber(str) {
+            if (!str) return 0;
+            return parseFloat(str.replace(/,/g, '')) || 0;
+        }
+
+        // Format input on blur and handle input
+        function setupFormattedInput(input) {
+            input.addEventListener('input', function(e) {
+                // Get cursor position
+                const cursorPos = this.selectionStart;
+                const oldLength = this.value.length;
+                
+                // Remove non-numeric characters except decimal and minus
+                let value = this.value.replace(/[^0-9.-]/g, '');
+                
+                // Format the number
+                if (value !== '' && value !== '-' && value !== '.') {
+                    const parts = value.split('.');
+                    if (parts[0] !== '' && parts[0] !== '-') {
+                        parts[0] = parseFloat(parts[0]).toLocaleString('en-US');
+                    }
+                    value = parts.join('.');
+                }
+                
+                this.value = value;
+                
+                // Adjust cursor position
+                const newLength = this.value.length;
+                const diff = newLength - oldLength;
+                this.setSelectionRange(cursorPos + diff, cursorPos + diff);
+                
+                calculate();
+            });
+        }
+
+        // Setup formatted inputs for all number fields
+        setupFormattedInput(tripLengthInput);
+        setupFormattedInput(kmplInput);
+        setupFormattedInput(fuelPriceInput);
+        setupFormattedInput(tankSizeInput);
+        setupFormattedInput(serviceCostInput);
+        setupFormattedInput(serviceIntervalInput);
+
         // Calculate and update results
         function calculate() {
-            // Parse input values
-            const tripLength = parseFloat(tripLengthInput.value) || 0;
+            // Parse input values (remove commas first)
+            const tripLength = parseFormattedNumber(tripLengthInput.value);
             const isRoundTrip = roundTripCheckbox.checked;
-            const kmpl = parseFloat(kmplInput.value) || 1;
-            const fuelPrice = parseFloat(fuelPriceInput.value) || 0;
-            const tankSize = parseFloat(tankSizeInput.value) || 1;
-            const serviceCost = parseFloat(serviceCostInput.value) || 0;
-            const serviceInterval = parseFloat(serviceIntervalInput.value) || 1;
+            const kmpl = parseFormattedNumber(kmplInput.value) || 1;
+            const fuelPrice = parseFormattedNumber(fuelPriceInput.value);
+            const tankSize = parseFormattedNumber(tankSizeInput.value) || 1;
+            const serviceCost = parseFormattedNumber(serviceCostInput.value);
+            const serviceInterval = parseFormattedNumber(serviceIntervalInput.value) || 1;
 
             // Calculate total distance
             const totalDistance = isRoundTrip ? tripLength * 2 : tripLength;
@@ -329,14 +382,8 @@
             tankPercentageElement.textContent = formatNumber(tankPercentage);
         }
 
-        // Add event listeners to all inputs
-        tripLengthInput.addEventListener('input', calculate);
+        // Add event listener for checkbox
         roundTripCheckbox.addEventListener('change', calculate);
-        kmplInput.addEventListener('input', calculate);
-        fuelPriceInput.addEventListener('input', calculate);
-        tankSizeInput.addEventListener('input', calculate);
-        serviceCostInput.addEventListener('input', calculate);
-        serviceIntervalInput.addEventListener('input', calculate);
 
         // Initial calculation on page load
         calculate();

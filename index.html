@@ -252,6 +252,43 @@
                 <input type="text" inputmode="decimal" id="serviceInterval" value="5,000" placeholder="KM between services">
             </div>
         </div>
+
+        <div class="secondary-inputs">
+            <h2>⚖️ Compare Fuel Efficiency</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="input-group" style="margin-bottom: 0;">
+                    <label for="compareKmpl1">Vehicle A (km/l)</label>
+                    <input type="text" inputmode="decimal" id="compareKmpl1" value="14" placeholder="e.g. 14">
+                </div>
+                <div class="input-group" style="margin-bottom: 0;">
+                    <label for="compareKmpl2">Vehicle B (km/l)</label>
+                    <input type="text" inputmode="decimal" id="compareKmpl2" value="20" placeholder="e.g. 20">
+                </div>
+            </div>
+
+            <div class="result" style="margin-top: 20px;">
+                <h2 id="compareSummary">Comparison</h2>
+                <div class="total" style="font-size: 32px;"><span id="compareDiffPercent">0.0</span>%</div>
+                <div class="breakdown">
+                    <div class="breakdown-item">
+                        <div class="label">Vehicle A Total Cost</div>
+                        <div class="value">Rs <span id="compareCost1">0.00</span></div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="label">Vehicle B Total Cost</div>
+                        <div class="value">Rs <span id="compareCost2">0.00</span></div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="label">Difference</div>
+                        <div class="value">Rs <span id="compareDiffAmount">0.00</span></div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="label">Over Distance</div>
+                        <div class="value"><span id="compareDistance">0</span> km</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -263,6 +300,8 @@
         const tankSizeInput = document.getElementById('tankSize');
         const serviceCostInput = document.getElementById('serviceCost');
         const serviceIntervalInput = document.getElementById('serviceInterval');
+        const compareKmpl1Input = document.getElementById('compareKmpl1');
+        const compareKmpl2Input = document.getElementById('compareKmpl2');
 
         // Get result elements
         const totalCostElement = document.getElementById('totalCost');
@@ -343,6 +382,8 @@
         setupFormattedInput(tankSizeInput);
         setupFormattedInput(serviceCostInput);
         setupFormattedInput(serviceIntervalInput);
+        setupFormattedInput(compareKmpl1Input);
+        setupFormattedInput(compareKmpl2Input);
 
         // Calculate and update results
         function calculate() {
@@ -380,6 +421,34 @@
             totalDistanceElement.textContent = formatNumber(totalDistance, 1);
             fuelRequiredElement.textContent = formatNumber(fuelRequired);
             tankPercentageElement.textContent = formatNumber(tankPercentage);
+
+            // --- Efficiency comparison ---
+            // Uses the trip distance from the top input and adds the same
+            // proportional service cost to each vehicle's total.
+            const kmplA = parseFormattedNumber(compareKmpl1Input.value);
+            const kmplB = parseFormattedNumber(compareKmpl2Input.value);
+
+            const costA = kmplA > 0 ? (totalDistance / kmplA) * fuelPrice + serviceProportionCost : 0;
+            const costB = kmplB > 0 ? (totalDistance / kmplB) * fuelPrice + serviceProportionCost : 0;
+            const diffAmount = costB - costA;
+            const diffPercent = costA > 0 ? (diffAmount / costA) * 100 : 0;
+
+            document.getElementById('compareCost1').textContent = formatNumber(costA);
+            document.getElementById('compareCost2').textContent = formatNumber(costB);
+            document.getElementById('compareDiffAmount').textContent = formatNumber(Math.abs(diffAmount));
+            document.getElementById('compareDiffPercent').textContent = formatNumber(Math.abs(diffPercent), 1);
+            document.getElementById('compareDistance').textContent = formatNumber(totalDistance, 1);
+
+            const summaryElement = document.getElementById('compareSummary');
+            if (kmplA <= 0 || kmplB <= 0) {
+                summaryElement.textContent = 'Enter both km/l values';
+            } else if (Math.abs(diffAmount) < 0.005) {
+                summaryElement.textContent = 'Vehicle B costs the same as Vehicle A';
+            } else if (diffAmount < 0) {
+                summaryElement.textContent = 'Vehicle B is cheaper than Vehicle A by';
+            } else {
+                summaryElement.textContent = 'Vehicle B is more expensive than Vehicle A by';
+            }
         }
 
         // Add event listener for checkbox

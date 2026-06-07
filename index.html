@@ -271,6 +271,14 @@
                 <div class="total" style="font-size: 32px;"><span id="compareDiffPercent">0.0</span>%</div>
                 <div class="breakdown">
                     <div class="breakdown-item">
+                        <div class="label">Vehicle A Fuel Cost</div>
+                        <div class="value">Rs <span id="compareFuel1">0.00</span></div>
+                    </div>
+                    <div class="breakdown-item">
+                        <div class="label">Vehicle B Fuel Cost</div>
+                        <div class="value">Rs <span id="compareFuel2">0.00</span></div>
+                    </div>
+                    <div class="breakdown-item">
                         <div class="label">Vehicle A Total Cost</div>
                         <div class="value">Rs <span id="compareCost1">0.00</span></div>
                     </div>
@@ -428,11 +436,15 @@
             const kmplA = parseFormattedNumber(compareKmpl1Input.value);
             const kmplB = parseFormattedNumber(compareKmpl2Input.value);
 
-            const costA = kmplA > 0 ? (totalDistance / kmplA) * fuelPrice + serviceProportionCost : 0;
-            const costB = kmplB > 0 ? (totalDistance / kmplB) * fuelPrice + serviceProportionCost : 0;
+            const fuelA = kmplA > 0 ? (totalDistance / kmplA) * fuelPrice : 0;
+            const fuelB = kmplB > 0 ? (totalDistance / kmplB) * fuelPrice : 0;
+            const costA = kmplA > 0 ? fuelA + serviceProportionCost : 0;
+            const costB = kmplB > 0 ? fuelB + serviceProportionCost : 0;
             const diffAmount = costB - costA;
             const diffPercent = costA > 0 ? (diffAmount / costA) * 100 : 0;
 
+            document.getElementById('compareFuel1').textContent = formatNumber(fuelA);
+            document.getElementById('compareFuel2').textContent = formatNumber(fuelB);
             document.getElementById('compareCost1').textContent = formatNumber(costA);
             document.getElementById('compareCost2').textContent = formatNumber(costB);
             document.getElementById('compareDiffAmount').textContent = formatNumber(Math.abs(diffAmount));
